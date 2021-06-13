@@ -1,39 +1,51 @@
 #include <iostream>
 
-bool is_in_range(int number){
-    if(0 <= number && number <= 255) return true;
-    else return false;
+bool is_string_correct(std::string str){
+    int dot_counter = 0;
+    for(int i = 0; i < str.length(); i++){
+        int n = str[i] - '0';
+        if(!(0 <= n && n <= 9)) return false;
+        if(str[i] == '.') dot_counter++;
+    }
+    return dot_counter == 3;
 }
 
-bool is_dot_correct(std::string str){
-    if(str[0] == '.' || str[str.length()-1] == '.') return false;
-    for(int i = 1; i < str.length(); i++){
-        if(str[i] == '.' && str[i-1] == '.') return false;
+std::string get_number(std::string ip, int index){
+    for(int i = 0; i < index; i++){ //pre
+        int pos = ip.find('.');
+        if(pos == -1) break;
+        ip = ip.erase(0, pos + 1);
     }
-    return true;
+    for(int i = 0; i < 3 - index; i++){ //post
+        int pos = ip.rfind('.');
+        if(pos == -1) break;
+        ip = ip.erase(pos);
+    }
+    return ip;
 }
 
-bool is_ip_correct(std::string ip){
-    for(int i = 0; i < ip.length(); i++){
-        if(ip[i] != '.' && '9' < ip[i] || ip[i] != '.' && ip[i] < '0') return false;
+bool is_number_correct(std::string number_str){
+    if(number_str == "") return false;
+    int number_int = std::stoi(number_str);
+    if(number_str[0] == '0'){
+        if(number_int == 0 && number_str.length() == 1){
+        } else return false;
     }
-    for(int i = 1; i < ip.length(); i++){
-        if(!is_in_range(std::stoi(ip.substr(ip.rfind('.') + 1)))) return false;
-        ip.erase(ip.rfind('.'));
-    }
-    return true;
-}
-
-bool is_zero_correct(std::string str){
-    for(int i = 1; i < str.length(); i++){
-        if(str[i] == '.' && str[i+1] == '0' && str[i+2] != '.') return false;
-    }
-    return true;
+    return (0 <= number_int && number_int < 256);
 }
 
 int main() {
     std::string ip;
-    std::cout << "Input your ip:" << std::endl;
+    std::cout << "Input the ip:" << std::endl;
     std::cin >> ip;
-    std::cout << (( is_dot_correct(ip) && is_ip_correct(ip) && is_zero_correct(ip))  ? "Yes" : "No");
+
+    for(int i = 0; i < 3; i++){
+        if(!(is_string_correct(ip) && is_number_correct(get_number(ip,i)))){
+            std::cout << "Wrong ip!" << std::endl;
+            return 0;
+        }
+    }
+
+    std::cout << "Correct ip!";
+    return 0;
 }
